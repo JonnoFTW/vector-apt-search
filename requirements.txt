@@ -1,2 +1,4 @@
-sentence-transformers
+onnxruntime-gpu
+light-embed
 platformdirs
+humanize
