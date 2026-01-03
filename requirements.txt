@@ -1,4 +1,5 @@
-onnxruntime-gpu
+onnxruntime-gpu[cuda,cudnn]
 light-embed
 platformdirs
 humanize
+numpy==2.3.2

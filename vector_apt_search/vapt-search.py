@@ -2,7 +2,7 @@
 import os
 from typing import Tuple
 
-from vector_apt_search.similarity import cosine_similarity
+from similarity import cosine_similarity
 
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 import argparse
@@ -13,7 +13,7 @@ from dataclasses import dataclass
 import pickle
 import hashlib
 
-# needs libapt-pkg-dev python3-apt
+# needs libapt-pkg-dev python3-apt cudnn9-cuda
 import apt
 import humanize
 import numpy as np
@@ -58,7 +58,7 @@ def update_vector_cache(descriptions: dict[str, PackageDescriptionHash], refresh
         exit(1)
 
     embedding_cache_dir = Path(f"{user_cache_dir()}/apt-vector")
-    description_cache_file = Path(embedding_cache_dir / "apt-description-cache.pkl")
+    description_cache_file = Path(embedding_cache_dir / "gpu-apt-description-cache.pkl")
     embedding_cache_dir.mkdir(parents=True, exist_ok=True)
 
     # check against the pickled description cache
@@ -94,12 +94,12 @@ def update_vector_cache(descriptions: dict[str, PackageDescriptionHash], refresh
                 descriptions[name].hash_val,
                 embedding,
             )
-        with open(description_cache_file, "wb") as f:
+        with description_cache_file.open("wb") as f:
             pickle.dump(descriptions_cached, f)
     return descriptions_cached, model
 
 
-def search_by_vector(model, query, descriptions_cached, top_k: int):
+def search_by_vector(model: TextEmbedding, query: str, descriptions_cached, top_k: int):
     """
     Returns the top k packages that are most similar to the query string.
     :param model:
